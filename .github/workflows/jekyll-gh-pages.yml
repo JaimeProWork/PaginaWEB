@@ -1,0 +1,51 @@
+# MUESTRA DE FLUJO DE TRABAJO PARA Construir e Implement Un Sitio de Jekyll en Las Páginas de Github
+Nombre: Implement Jekyll Con Dependencias de Páginas Github Preinstaladas
+
+Interno:
+  # Ejecuta Con Puse Dirigido a la Rama Predeterminada
+  empujar:
+    Sucursales: ["Principal"]
+
+  # Le PERMITE EJECUTAR ESTE FLUJO DE TRABAJO MANUALMENTE DESDE LA PESTARA
+  workflow_dispatch:
+
+# Establecer permisos de github_token para permitir la implementación en páginas github
+permiso:
+  Contenido: mirada lasciva
+  Páginas: Escrita
+  Token de Identificación: Escrita
+
+# Permitir solo un Despliegue Concurrente, omitiendo Las Ejecuciones en Cola Entre la EjeciNn de la Ejecución y la Última Cola.
+# Sin embargo, no cancele las ejecuciones en Progreso, que QUE QUEREMOS PERMITIR QUE ESTAS IMPLEMENTES DE PROCCIÓN COMPLETEN.
+concurrencia:
+  Grupo: "Páginas"
+  cancelar en Progreso: Falso
+
+trabajos:
+  # Construyr un trabajo
+  construir:
+    Corredizo: Ubuntu-lateral
+    pasos:
+      - Nombre: Verificar
+        usos: Acciones/Pago@V4
+      - Nombre: Configuración de Páginas
+        usos: Acciones/Configurar páginas@v5
+      - Nombre: Construye con jekyll
+        usos: Acciones/Jekyll-Build-Pages@V1
+        con:
+          Fuente: ./
+          destino: ./_sitio
+      - Nombre: Subir artefacto
+        usos: Acciones/Subiendo Pages-Artifact@V3
+
+  # Trabajo de implementación
+  desplegar:
+    ambiente:
+      Nombre: páginas de github
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
